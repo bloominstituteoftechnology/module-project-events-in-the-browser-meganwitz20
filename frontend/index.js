@@ -1,11 +1,11 @@
 // 👉 TASK 1 - Understand the existing code 👈
 function moduleProject2() {
-  // 👇 WORK WORK BELOW THIS LINE 👇
+  // 👇 WORK WORK BELOW THIS LINE 
   let startTime = new Date().getTime() // Record start time
 
   function getTimeElapsed() { // To be used at end of game to get elapsed time
-    let currentTime = new Date().getTime()
-    return currentTime - startTime
+    let currentTime = new Date().getTime()// Record start time
+    return currentTime - startTime // Return difference in time
   }
 
   // Setting up the footer content
@@ -19,7 +19,7 @@ function moduleProject2() {
     right: 'ArrowRight',
     down: 'ArrowDown',
     left: 'ArrowLeft',
-  }
+  } 
 
   // Helper function to grab all squares
   const getAllSquares = () => document.querySelectorAll('.square')
@@ -36,10 +36,15 @@ function moduleProject2() {
       square.classList.add('square')
       row.appendChild(square)
       square.addEventListener('click', () => {
-        // 👉 TASK 2 - Use a click handler to target a square 👈
+        // 👉 TASK 2 - Use a click handler to target a square 
+        if (!square.classList.contains('targeted')) {
+          document.querySelector('.targeted')?.classList.remove('targeted')
+          square.classList.add('targeted')
+        }
       })
     }
   }
+
   document.querySelector('.row:nth-child(3)')
     .children[2].classList.add('targeted') // Initial square being targeted
 
@@ -65,13 +70,70 @@ function moduleProject2() {
 
   document.addEventListener('keydown', evt => {
     // 👉 TASK 3 - Use the arrow keys to highlight a new square 👈
+    let currentlyTargeted = document.querySelector('.targeted');
+    let currentRow = currentlyTargeted.parentElement;
+    let currentSquareIndex = Array.from(currentRow.children).indexOf(currentlyTargeted);
+
+    if (evt.key === keys.up) {
+      let previousRow = currentRow.previousElementSibling;
+      if (previousRow) {
+        currentlyTargeted.classList.remove('targeted');
+        previousRow.children[currentSquareIndex].classList.add('targeted');
+      }
+    } else if (evt.key === keys.down) {
+      let nextRow = currentRow.nextElementSibling;
+      if (nextRow) {
+        currentlyTargeted.classList.remove('targeted');
+        nextRow.children[currentSquareIndex].classList.add('targeted');
+      }
+    } else if (evt.key === keys.left) {
+      if (currentSquareIndex > 0) {
+        currentlyTargeted.classList.remove('targeted');
+        currentRow.children[currentSquareIndex - 1].classList.add('targeted');
+      }
+    } else if (evt.key === keys.right) {
+      if (currentSquareIndex < currentRow.children.length - 1) {
+        currentlyTargeted.classList.remove('targeted');
+        currentRow.children[currentSquareIndex + 1].classList.add('targeted');
+      }
+    }
 
     // 👉 TASK 4 - Use the space bar to exterminate a mosquito 👈
+    if (evt.key === keys.space) {
+      let currentlyTargeted = document.querySelector('.targeted');
+      let mosquito = currentlyTargeted.querySelector('img');
 
-    // 👉 TASK 5 - End the game 👈
-  })
+      if (mosquito && mosquito.dataset.status === 'alive') {
+        mosquito.dataset.status = 'dead';
+        currentlyTargeted.style.backgroundColor = 'red';
+        areAllMosquitoesDead();
+      }
+    }
+  });
+
+  // 👉 TASK 5 - End the game 👈
+  function areAllMosquitoesDead() {
+    let allMosquitoes = document.querySelectorAll('.square img');
+    if (Array.from(allMosquitoes).every(mosquito => mosquito.dataset.status === 'dead')) {
+      let infoElement = document.querySelector('p.info');
+      infoElement.textContent = `Extermination completed in ${getTimeElapsed() / 1000} seconds!`;
+    }
+  }
+
+  // Add restart button
+  let restartBtn = document.createElement('button');
+  restartBtn.id = 'restart-btn';
+  restartBtn.textContent = 'Restart';
+  document.querySelector('header h2').appendChild(restartBtn);
+
+  document.querySelector('#restart-btn').addEventListener('click', () => {
+    window.location.reload();
+  });
+
   // 👆 WORK WORK ABOVE THIS LINE 👆
 }
+
+// 👆 WORK WORK ABOVE THIS LINE 👆
 
 // ❗ DO NOT MODIFY THE CODE BELOW
 // ❗ DO NOT MODIFY THE CODE BELOW
